@@ -2,21 +2,16 @@ name: Python Sample CI
 
 on:
   push:
-    branches: [ main ]
+    branches: 
+      - main
+    paths:
+      - 'tests/python-service/**'   # trigger only when files under python-service change
+  workflow_dispatch:              # allow manual run
   pull_request:
 
 jobs:
   test:
     runs-on: ubuntu-latest
-    services:
-      flask:
-        image: python:3.10
-        ports:
-          - 5000:5000
-        options: --name flask-service
-        volumes:
-          - ${{ github.workspace }}:/app
-        command: bash -c "cd /app && pip install -r requirements.txt && python app.py"
 
     steps:
       - uses: actions/checkout@v3
@@ -24,10 +19,23 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: 3.10
+          python-version: '3.10'
 
       - name: Install dependencies
         run: pip install -r requirements.txt
+
+      - name: Start Flask app (background)
+        run: |
+          nohup python app.py > app.log 2>&1 &
+          # wait for server to be reachable
+          for i in {1..30}; do
+            if curl -fsS http://localhost:5000/todos >/dev/null 2>&1; then
+              echo "Flask app is up"
+              break
+            fi
+            echo "Waiting for Flask app..."
+            sleep 1
+          done
 
       # Unit + Integration
       - name: Run Pytest (Unit + Integration)
@@ -40,3 +48,13 @@ jobs:
       # Performance (Locust headless mode)
       - name: Run Locust Load Test
         run: locust -f tests/performance/locustfile.py --host=http://localhost:5000 --headless -u 10 -r 2 -t 30s
+
+      # Optional: upload artifacts for your platform ingestion
+      - name: Upload test results
+        uses: actions/upload-artifact@v3
+        with:
+          name: python-test-results
+          path: |
+            results.xml
+            results-api.xml
+            app.log
