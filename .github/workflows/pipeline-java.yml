@@ -17,6 +17,10 @@ jobs:
           distribution: temurin
           java-version: 17
 
+      - name: list directories
+        run: |
+          pwd
+          ls -la
       - name: Build with Maven
         run: mvn -B -ntp -f tests/java-service/pom.xml clean verify
       # Unit + Integration
