@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: tests/node-service   # 👈 sets the default directory
+        working-directory: node-service/tests   # 👈 sets the default directory
 
     steps:
       - uses: actions/checkout@v3
@@ -32,7 +32,7 @@ jobs:
           JEST_JUNIT_OUTPUT: results/junit-results.xml
 
       - name: Run API tests with Newman
-        run: npx newman run tests/api/postman_collection.json -r cli,junit --reporter-junit-export results/postman-results.xml
+        run: npx newman run api/postman_collection.json -r cli,junit --reporter-junit-export results/postman-results.xml
 
       - name: Install Playwright deps
         run: npx playwright install --with-deps
