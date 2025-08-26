@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: node-service/tests   # 👈 sets the default directory
+        working-directory: tests/node-service   # 👈 sets the default directory
 
     steps:
       - uses: actions/checkout@v3
