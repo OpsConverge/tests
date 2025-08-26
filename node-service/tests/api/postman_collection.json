@@ -1,0 +1,21 @@
+
+{
+  "info": {
+    "name": "Node Sample API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Ping",
+      "request": { "method": "GET", "url": "http://localhost:3000/ping" }
+    },
+    {
+      "name": "Create Todo",
+      "request": {
+        "method": "POST",
+        "url": "http://localhost:3000/todos",
+        "body": { "mode": "raw", "raw": "{\"task\": \"from postman\"}" }
+      }
+    }
+  ]
+}

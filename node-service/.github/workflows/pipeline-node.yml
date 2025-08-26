@@ -1,0 +1,30 @@
+# .github/workflows/pipeline-node.yml
+name: Node Sample CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - run: npm install
+
+      # Unit + Integration (Jest + Supertest)
+      - run: npx jest --ci --reporters=default --reporters=jest-junit
+        env:
+          JEST_JUNIT_OUTPUT: results/junit-results.xml
+
+      # API Tests (Postman/Newman)
+      - run: npx newman run tests/api/postman_collection.json -r cli,junit --reporter-junit-export results/postman-results.xml
+
+      # E2E (Playwright)
+      - run: npx playwright install --with-deps
+      - run: npx playwright test --reporter=junit --output results/

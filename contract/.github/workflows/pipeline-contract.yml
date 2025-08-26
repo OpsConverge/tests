@@ -1,0 +1,36 @@
+name: Contract Tests
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+jobs:
+  contract-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install Consumer Dependencies
+        run: |
+          cd consumer
+          npm install
+          npm test
+
+      - name: Install Provider Dependencies
+        run: |
+          cd provider
+          npm install
+          npm test
+
+      - name: Upload Pact Files
+        uses: actions/upload-artifact@v3
+        with:
+          name: pact-contracts
+          path: consumer/pacts/*.json

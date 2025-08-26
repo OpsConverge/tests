@@ -1,0 +1,32 @@
+name: Mobile E2E Tests
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+jobs:
+  android-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Install Appium
+        run: npx appium driver install uiautomator2
+
+      - name: Run Appium Tests
+        run: npm test
+
+      - name: Upload Test Results
+        uses: actions/upload-artifact@v3
+        with:
+          name: junit-results
+          path: results/

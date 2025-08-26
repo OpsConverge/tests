@@ -1,0 +1,33 @@
+# .github/workflows/pipeline-java.yml
+name: Java Sample CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Build with Maven
+        run: mvn -B package --file pom.xml
+
+      # Unit + Integration
+      - name: Run JUnit Tests
+        run: mvn test -Dsurefire.reportFormat=xml
+
+      # API (REST Assured runs as part of mvn test)
+      - name: Run API Tests
+        run: mvn test -Dtest=TodoApiTest
+
+      # Performance (Gatling)
+      - name: Run Gatling Tests
+        run: mvn gatling:test
