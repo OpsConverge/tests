@@ -1,0 +1,48 @@
+name: Node Sample CI
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'tests/node-service/**'   # trigger only when files under node-service change
+  workflow_dispatch:              # allow manual run
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        run: npm install
+
+      # Unit + Integration (Jest + Supertest)
+      - name: Run Jest tests
+        run: npx jest --ci --reporters=default --reporters=jest-junit
+        env:
+          JEST_JUNIT_OUTPUT: results/junit-results.xml
+
+      # API Tests (Postman/Newman)
+      - name: Run API tests with Newman
+        run: npx newman run tests/node-service/tests/api/postman_collection.json -r cli,junit --reporter-junit-export results/postman-results.xml
+
+      # E2E (Playwright)
+      - name: Install Playwright deps
+        run: npx playwright install --with-deps
+      - name: Run Playwright tests
+        run: npx playwright test --reporter=junit --output results/
+
+      # Upload results as artifacts (optional, useful for your platform ingestion)
+      - name: Upload test results
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-results
+          path: results/
