@@ -4,8 +4,8 @@ on:
   push:
     branches:
       - main
-    paths:
-      - 'tests/node-service/**'   # trigger only when files under node-service change
+    # paths:
+    #   - 'tests/node-service/**'   # trigger only when files under node-service change
   workflow_dispatch:              # allow manual run
 
 jobs:
@@ -24,7 +24,10 @@ jobs:
           node-version: 18
 
       - name: Install dependencies
-        run: npm install
+        run: |
+           pwd
+           cd node-service
+           npm install
 
       - name: Run Jest tests
         run: npx jest --ci --reporters=default --reporters=jest-junit
