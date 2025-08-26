@@ -11,9 +11,9 @@ on:
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: tests/node-service   # 👈 sets the default directory
+    # defaults:
+    #   run:
+    #     working-directory: tests/node-service   # 👈 sets the default directory
 
     steps:
       - uses: actions/checkout@v3
